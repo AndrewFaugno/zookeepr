@@ -59,6 +59,22 @@ function createNewAnimal(body, animalsArray) {
     return animal;
 }
 
+function validateAnimal(animal) {
+    if (!animal.name || typeof animal.name !== 'string') {
+        return false;
+    }
+    if (!animal.species || typeof animal.species !== 'string') {
+        return false;
+    }
+    if (!animal.diet || typeof animal.species !== 'string') {
+        return false;
+    }
+    if (!animal.personalityTraits || typeof animal.personalityTraits !== 'string') {
+        return false;
+    }
+    return true;
+};
+
 app.get('/api/animals', (req, res) => {
     let result = animals; 
     if (req.query) {
@@ -80,10 +96,15 @@ app.post('/api/animals', (req, res) => {
     // set id based on what next index of the array will be
     req.body.id = animals.length.toString();
 
-    // add animal to json file and animals array in this function
-    const animal = createNewAnimal(req.body, animals);
-
-    res.json(animal);
+    // if any data in req.body is incorrect, send 400 error back
+    if (!validateAnimal(req.body)) {
+        res.status(400).send('The animal is not properly formatted.');
+    } else {
+        // add animal to json file and animals array in this function
+        const animal = createNewAnimal(req.body, animals);
+    
+        res.json(animal);
+    }
 });
 
 app.listen(PORT, () => {
